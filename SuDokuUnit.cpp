@@ -1,10 +1,12 @@
 #include "SuDokuUnit.h"
 
-	SuDokuUnit::SuDokuUnit()
-		:	digits( { 0, 0, 0, 0, 0, 0, 0, 0, 0 } )
-		,	usedDigits( { false, false, false, false, false, false, false, false, false } )
-		,	unSolvedDigits( 9 )
-		,	type( Type::Row )
+#include <algorithm>
+
+SuDokuUnit::SuDokuUnit()
+	:	digits( { 0, 0, 0, 0, 0, 0, 0, 0, 0 } )
+	,	usedDigits( { false, false, false, false, false, false, false, false, false } )
+	,	unSolvedDigits( 9 )
+	,	type( Type::Row )
 	
 {
 }
@@ -39,40 +41,59 @@ bool SuDokuUnit::DoInsertionChecks( int32_t digit, uint32_t pos )
 	else
 		std::cout << "NOTE : pos " << pos << " was already set : " << digits[ pos ] << "\n";
 
-	std::cout << std::endl;
-
 	return true;
 }
 bool SuDokuUnit::Insert( int32_t digit, uint32_t pos )
 {
-	std::cout << "Inserting " << digit << " @ " << pos << " -> ";
+	if ( digit == 0 )
+		return false;
+
+	std::string str;
+
+	switch ( type )
+	{
+		case Type::Row:
+			str = "row";
+			break;
+		case Type::Column:
+			str = "column";
+			break;
+		case Type::Square:
+			str = "square";
+			break;
+	}
+	std::cout << "Inserting " << str << " - " << digit << " @ " << pos << " -> ";
 
 	if ( DoInsertionChecks( digit, pos ) )
 	{
 		digits[ pos ] = digit;
-		usedDigits[ static_cast< uint32_t > ( digit ) + 1 ] = true;
+		usedDigits[ static_cast< uint32_t > ( digit ) - 1 ] = true;
 		return true;
 	}
 
 	return false;
 }
-void SuDokuUnit::Solve()
+SolveResult SuDokuUnit::Solve()
 {
 	if ( !IsOnlyMissingOneDigit() )
-		return;
+		return SolveResult( 0, 0 );
 
-	Solve( FindSingleUnsetDigitPos() );
+	return Solve( FindSingleUnsetDigitPos() );
 }
-void SuDokuUnit::Solve( uint32_t unsetDigitPos )
+SolveResult SuDokuUnit::Solve( uint32_t unsetDigitPos )
 {
+	SolveResult result( 0, unsetDigitPos );
 	for ( uint32_t i = 0; i < 9 ; ++i )
 	{
 		if ( !usedDigits[ i ] )
 		{
-			digits[ unsetDigitPos ] = static_cast< int32_t > ( i + 1 );
-			return;
+			Insert( i + 1, unsetDigitPos );
+			result.digit = i + 1;
+			return result;
 		}
 	}
+
+	return result;
 }
 uint32_t SuDokuUnit::FindSingleUnsetDigitPos()
 {

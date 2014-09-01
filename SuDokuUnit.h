@@ -2,8 +2,19 @@
 
 #include <array>
 #include <iostream>
-#include <algorithm>
 
+struct SolveResult
+{
+	SolveResult( int32_t digit_, uint32_t pos_, bool solved_ = false )
+		:	digit( digit_ )
+		,	position( pos_ )
+		,	solved( solved_ )
+	{
+	}
+	int32_t digit;
+	uint32_t position;
+	bool solved;
+};
 enum class Type
 {
 	Row,
@@ -40,7 +51,7 @@ class SuDokuUnit
 	void PrintSquare() const;
 
 	private:
-	void Solve( uint32_t unsetDigitPos );
+	SolveResult Solve( uint32_t unsetDigitPos );
 
 	std::array< int32_t , 9 > digits;
 	std::array< bool, 9 > usedDigits;
@@ -48,4 +59,3 @@ class SuDokuUnit
 	int32_t unSolvedDigits;
 	Type type;
 };
-
