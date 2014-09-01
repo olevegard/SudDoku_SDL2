@@ -30,7 +30,7 @@ class SuDokuUnit
 	SuDokuUnit( const std::array< int32_t , 9 > &data );
 	
 	bool Insert( int32_t digit, uint32_t pos );
-	void Solve();
+	SolveResult Solve();
 
 	void SetType( Type type_ );
 
