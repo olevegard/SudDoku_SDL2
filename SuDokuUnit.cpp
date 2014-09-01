@@ -147,3 +147,7 @@ void SuDokuUnit::Print( ) const
 	else if ( type == Type::Square )
 		PrintSquare();
 }
+void SuDokuUnit::SetType( Type type_ )
+{
+	type = type_;
+}

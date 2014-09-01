@@ -21,6 +21,8 @@ class SuDokuUnit
 	bool Insert( int32_t digit, uint32_t pos );
 	void Solve();
 
+	void SetType( Type type_ );
+
 	uint32_t FindSingleUnsetDigitPos();
 	bool DoInsertionChecks( int32_t digit, uint32_t pos );
 
