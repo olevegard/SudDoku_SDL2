@@ -189,12 +189,13 @@ class SuDokuBoard
 		{
 			SolveResult result = squares[ CalculateSquareIndex( 0, squareIndex ) ].Solve();
 
+			if ( !result.solved )
+				return;
+
 			uint32_t rowIndex = ( ( squareIndex / 3 ) * 3 ) + ( result.position / 3 );
 			uint32_t columnIndex = ( ( squareIndex % 3 ) * 3 ) + ( result.position % 3 );
 
-			rows[ rowIndex ].Insert( result.digit, columnIndex );
-			columns[ columnIndex ].Insert( result.digit, rowIndex );
-			board[ columnIndex ][ rowIndex ] = result.digit;
+			Insert( result.digit, columnIndex, rowIndex );
 		}
 		void Print()
 		{
@@ -205,9 +206,19 @@ class SuDokuBoard
 				rows[i].Print();
 			}
 		}
+		void Insert( int32_t digit, uint32_t column, uint32_t row )
+		{
+			auto squarePos = CalculateSquarePos( column, row );
+
+			columns[ column ].Insert( digit, row );
+			rows   [ row    ].Insert( digit, column );
+			squares[ squarePos.first ].Insert( digit, squarePos.second );
+
+			board[ column][ row] = digit;
+		}
+
 		void Set( int32_t digit, uint32_t column, uint32_t row )
 		{
-
 			auto squarePos = CalculateSquarePos( column, row );
 
 			rows   [ row    ].SetType( Type::Row );

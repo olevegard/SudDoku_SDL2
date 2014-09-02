@@ -90,6 +90,7 @@ SolveResult SuDokuUnit::Solve( uint32_t unsetDigitPos )
 			int32_t digit = static_cast< int32_t > ( i + 1 );
 			Insert( digit , unsetDigitPos );
 			result.digit = digit;
+			result.solved = true;
 			return result;
 		}
 	}
