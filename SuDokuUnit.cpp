@@ -87,8 +87,9 @@ SolveResult SuDokuUnit::Solve( uint32_t unsetDigitPos )
 	{
 		if ( !usedDigits[ i ] )
 		{
-			Insert( i + 1, unsetDigitPos );
-			result.digit = i + 1;
+			int32_t digit = static_cast< int32_t > ( i + 1 );
+			Insert( digit , unsetDigitPos );
+			result.digit = digit;
 			return result;
 		}
 	}

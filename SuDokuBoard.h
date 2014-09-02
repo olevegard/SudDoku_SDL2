@@ -1,19 +1,44 @@
 #pragma once
 
+// SuDoku
 #include "SuDokuUnit.h"
+#include "Position.h"
+
+// Rendering
+#include "Texture_Text.h"
+#include "Renderer.h"
+#include "Window.h"
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 #include <algorithm>
 #include <memory>
 
+
+
+
 class SuDokuBoard
 {
 	public:
-		SuDokuBoard()
+		void InitRenderingSystem()
+		{
+			newWindow.CreateWindow( { 0, 0 }, { 600, 800 }, "SuDoku" );
+			newRenderer.Init( newWindow );
+
+			windowMiddle.x = static_cast< int32_t > ( windowRect.w * 0.5 );
+			windowMiddle.y = static_cast< int32_t > ( windowRect.h * 0.5 );
+
+			font.Init( "sketchy.ttf", 24 );
+		}
+		void SetupSuDokuUnits()
 		{
 			std::for_each( std::begin( rows    ), std::end( rows    ), []( SuDokuUnit &unit ){ unit.SetType( Type::Row ); } );
 			std::for_each( std::begin( columns ), std::end( columns ), []( SuDokuUnit &unit ){ unit.SetType( Type::Column ); } );
 			std::for_each( std::begin( squares ), std::end( squares ), []( SuDokuUnit &unit ){ unit.SetType( Type::Square ); } );
-
+		}
+		void InsertDigits()
+		{
 			// Row 1
 			Set( 5, 0, 0 ); 
 			Set( 3, 1, 0 ); 
@@ -112,9 +137,53 @@ class SuDokuBoard
 			Set( 0, 6, 8 ); 
 			Set( 0, 7, 8 ); 
 			Set( 8, 8, 8 ); 
+		}
+		void PositionUnits()
+		{
+			SDL_Point pos = { 10, 10 };
+			for ( uint32_t row = 0 ; row < 9 ; ++row )
+			{
+				if ( row > 0 && ( ( row % 3 ) == 0 ) )
+					pos.y += 30;
 
-			Print();
+				for ( uint32_t col = 0 ; col  < 9 ; ++col )
+				{
+					if ( col > 0 && ( ( col  % 3 ) == 0 ) )
+						pos.x += 30;
+
+					board[col][row].Init( font.GetFont(), { 255, 0, 0, 255 }, { 255, 255, 255, 255 } );
+					board[col][row].SetPos( pos );
+
+					pos.x += 30;
+				}
+				pos.x = 10;
+				pos.y += 30;
+			}
+		}
+		void Render()
+		{
+			newRenderer.RenderClear();
+			for ( uint32_t row = 0 ; row < 9 ; ++row )
+			{
+				for ( uint32_t col = 0 ; col  < 9 ; ++col )
+				{
+					board[col][row].Render(newRenderer.renderer ); 
+				}
+			}
+			newRenderer.RenderPresent();
+		}
+		SuDokuBoard()
+		{
+			InitRenderingSystem();
+			SetupSuDokuUnits();
+			InsertDigits();
+			PositionUnits();
+
+			Render();
 			SolveSquare( 6 );
+			std::cin.ignore();
+			Render();
+			std::cin.ignore();
 		}
 		void SolveSquare( uint32_t squareIndex )
 		{
@@ -125,15 +194,7 @@ class SuDokuBoard
 
 			rows[ rowIndex ].Insert( result.digit, columnIndex );
 			columns[ columnIndex ].Insert( result.digit, rowIndex );
-
-			std::cout << "Inserted into column " << columnIndex << " and row : " << rowIndex << std::endl;
-			squares[squareIndex].Print();
-			std::cout << std::endl;
-			columns[columnIndex].Print();
-			std::cout << std::endl;
-			rows[rowIndex].Print();
-			std::cout << std::endl;
-
+			board[ columnIndex ][ rowIndex ] = result.digit;
 		}
 		void Print()
 		{
@@ -146,6 +207,7 @@ class SuDokuBoard
 		}
 		void Set( int32_t digit, uint32_t column, uint32_t row )
 		{
+
 			auto squarePos = CalculateSquarePos( column, row );
 
 			rows   [ row    ].SetType( Type::Row );
@@ -157,6 +219,7 @@ class SuDokuBoard
 			squares[ squarePos.first ].SetType( Type::Square );
 			squares[ squarePos.first ].Insert( digit, squarePos.second );
 
+			std::cout << "Setting board : " << column << ", " << row << " to " << digit << std::endl;
 			board[ column ][ row ] = digit;
 		}
 		void PrintInsertInfo( int32_t digit, uint32_t column, uint32_t row, std::pair< uint32_t, uint32_t > squarePos )
@@ -188,5 +251,13 @@ class SuDokuBoard
 		std::array< SuDokuUnit, 9 > rows;
 		std::array< SuDokuUnit, 9 > columns;
 		std::array< SuDokuUnit, 9 > squares;
-		std::array< std::array< int32_t, 9 >, 9 > board;
+		std::array< std::array< Position, 9 >, 9 > board;
+
+		SDL_Rect windowRect = { 0, 0, 600, 800 };
+		SDL_Point windowMiddle;
+
+		Renderer newRenderer;
+		Window newWindow;
+
+		Font font;
 };
