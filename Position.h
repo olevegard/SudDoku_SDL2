@@ -12,15 +12,29 @@ struct Position// : Texture_Text
 	std::array< bool, 9 > possible;
 	Texture_Text mainNumber;
 
+	SDL_Rect rect;
+
 	Position()
+		:	rect( { 10, 10, 80, 80 } )
 	{
+		mainNumber.SetPos( { rect.x + 10, rect.y + 10 } );
 		locked = false;
 		std::fill( std::begin( possible ), std::end( possible ), true );
 		value = 0;
 	}
 	void SetPos( SDL_Point p )
 	{
-		mainNumber.SetPos( p );
+		rect.x = p.x;
+		rect.y = p.y;
+
+		SDL_Rect digitRect = mainNumber.GetRect();
+		SDL_Point sizeDiff
+		{
+			( rect.w - digitRect.w ) / 2,
+			( rect.h - digitRect.h ) / 2
+		};
+
+		mainNumber.SetPos( { rect.x + sizeDiff.x,  rect.y + sizeDiff.y } );
 	}
 	void Init( TTF_Font *font, const SDL_Color &bgColor, const SDL_Color &fgColor )
 	{
@@ -64,6 +78,8 @@ struct Position// : Texture_Text
 	}
 	void Render( SDL_Renderer* renderer )
 	{
+		SDL_SetRenderDrawColor( renderer, 0,0, 255, 255 );
+		SDL_RenderDrawRect( renderer, &rect );
 		Refresh( renderer );
 		mainNumber.Render( renderer );
 	}

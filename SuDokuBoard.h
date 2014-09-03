@@ -23,7 +23,7 @@ class SuDokuBoard
 	public:
 		void InitRenderingSystem()
 		{
-			newWindow.CreateWindow( { 0, 0 }, { 600, 800 }, "SuDoku" );
+			newWindow.CreateWindow( { 0, 0 }, { 1000, 1000 }, "SuDoku" );
 			newRenderer.Init( newWindow );
 
 			windowMiddle.x = static_cast< int32_t > ( windowRect.w * 0.5 );
@@ -144,20 +144,21 @@ class SuDokuBoard
 			for ( uint32_t row = 0 ; row < 9 ; ++row )
 			{
 				if ( row > 0 && ( ( row % 3 ) == 0 ) )
-					pos.y += 30;
+					pos.y += 80;
 
 				for ( uint32_t col = 0 ; col  < 9 ; ++col )
 				{
 					if ( col > 0 && ( ( col  % 3 ) == 0 ) )
-						pos.x += 30;
+						pos.x += 80;
 
 					board[col][row].Init( font.GetFont(), { 255, 0, 0, 255 }, { 255, 255, 255, 255 } );
+					board[col][row].Refresh( newRenderer.renderer );
 					board[col][row].SetPos( pos );
 
-					pos.x += 30;
+					pos.x += 80;
 				}
 				pos.x = 10;
-				pos.y += 30;
+				pos.y += 80;
 			}
 		}
 		void Render()
@@ -179,8 +180,8 @@ class SuDokuBoard
 			InsertDigits();
 			PositionUnits();
 
-			Render();
 			SolveSquare( 6 );
+			Render();
 			std::cin.ignore();
 			Render();
 			std::cin.ignore();

@@ -27,6 +27,11 @@ SuDokuUnit::SuDokuUnit( const std::array< int32_t , 9 > &data )
 }
 bool SuDokuUnit::DoInsertionChecks( int32_t digit, uint32_t pos )
 {
+	if ( digits[ pos ] == digit )
+	{
+		std::cout << "NOTE : digit " << digit << " already set in pos " << pos << "\n";
+		return false;
+	}
 	if ( IsAlreadyInUnit( digit ) )
 	{
 		std::cout << "ERROR : " << digit << " is already in unit!\n\n";

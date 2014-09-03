@@ -21,6 +21,8 @@ void Texture_Text::Init( TTF_Font *font, const SDL_Color &bgColor, const SDL_Col
 	textFont = font;
 	textColor = bgColor;
 	backgroundColor = fgColor;
+
+	SetSizeFromTexture();
 }
 void Texture_Text::RenderText_Solid( SDL_Renderer* renderer, const std::string &str )
 {
