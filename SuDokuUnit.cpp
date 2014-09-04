@@ -3,8 +3,8 @@
 #include <algorithm>
 
 SuDokuUnit::SuDokuUnit()
-	:	digits( { 0, 0, 0, 0, 0, 0, 0, 0, 0 } )
-	,	usedDigits( { false, false, false, false, false, false, false, false, false } )
+	:	digits( { { 0, 0, 0, 0, 0, 0, 0, 0, 0 } } )
+	,	usedDigits( { { false, false, false, false, false, false, false, false, false } } )
 	,	unSolvedDigits( 9 )
 	,	type( Type::Row )
 	

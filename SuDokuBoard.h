@@ -15,9 +15,6 @@
 #include <algorithm>
 #include <memory>
 
-
-
-
 class SuDokuBoard
 {
 	public:
@@ -30,6 +27,7 @@ class SuDokuBoard
 			windowMiddle.y = static_cast< int32_t > ( windowRect.h * 0.5 );
 
 			font.Init( "sketchy.ttf", 24 );
+			fontSmall.Init( "sketchy.ttf", 22 );
 		}
 		void SetupSuDokuUnits()
 		{
@@ -151,7 +149,8 @@ class SuDokuBoard
 					if ( col > 0 && ( ( col  % 3 ) == 0 ) )
 						pos.x += 80;
 
-					board[col][row].Init( font.GetFont(), { 255, 0, 0, 255 }, { 255, 255, 255, 255 } );
+					board[col][row].InitMainNumber( font.GetFont(), { 255, 0, 0, 255 }, { 255, 255, 255, 255 } );
+					board[col][row].InitSmallNumber( fontSmall.GetFont(), { 255, 0, 0, 255 }, { 0, 0, 255, 255 } );
 					board[col][row].Refresh( newRenderer.renderer );
 					board[col][row].SetPos( pos );
 
@@ -272,4 +271,5 @@ class SuDokuBoard
 		Window newWindow;
 
 		Font font;
+		Font fontSmall;
 };

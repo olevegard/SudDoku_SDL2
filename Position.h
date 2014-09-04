@@ -11,6 +11,7 @@ struct Position// : Texture_Text
 	bool locked;
 	std::array< bool, 9 > possible;
 	Texture_Text mainNumber;
+	std::array< Texture_Text, 9 > smallNumbers;
 
 	SDL_Rect rect;
 
@@ -36,9 +37,22 @@ struct Position// : Texture_Text
 
 		mainNumber.SetPos( { rect.x + sizeDiff.x,  rect.y + sizeDiff.y } );
 	}
-	void Init( TTF_Font *font, const SDL_Color &bgColor, const SDL_Color &fgColor )
+	void InitMainNumber( TTF_Font *font, const SDL_Color &bgColor, const SDL_Color &fgColor )
 	{
 		mainNumber.Init( font, bgColor, fgColor );
+
+	}
+	void InitSmallNumber( TTF_Font *font, const SDL_Color &bgColor, const SDL_Color &fgColor )
+	{
+		SDL_Point pos{ 5, 5 };
+		SDL_Rect r = smallNumbers[ 0 ].GetRect();
+		for ( auto i = 0; i < 9 ; ++i )
+		{
+			smallNumbers[ i ].Init( font, bgColor, fgColor );
+			smallNumbers[ i ].SetPos( { rect.x + pos.x, rect.y + pos.y } );
+
+			pos.x += 5 + r.w;
+		}
 	}
 	void SetValue( int32_t value_ )
 	{
@@ -62,6 +76,33 @@ struct Position// : Texture_Text
 			mainNumber.RenderText_Solid( renderer, "-" );
 		else
 			mainNumber.RenderNumber( renderer, value );
+
+		for ( auto i = 0 ; i < 9 ; ++i )
+			smallNumbers[ i ].RenderNumber( renderer,  i + 1);
+
+		PositionSmallNumbers();
+	}
+	void PositionSmallNumbers()
+	{
+		SDL_Rect size = smallNumbers[ 0 ].GetRect();
+		SDL_Point totalSize = { size.w * 3, size.h * 3 };
+		SDL_Point totalMargin = { rect.w - totalSize.x, rect.h - totalSize.y };
+		SDL_Point margin = { totalMargin.x / 4, totalMargin.y / 4 };
+
+		SDL_Point pos{ margin.x, margin.y };
+
+		for ( auto i = 0 ; i < 9 ; ++i )
+		{
+			if ( i > 0 && ( ( i % 3 ) == 0 ) )
+			{
+				pos.x = margin.x;
+				pos.y += size.h + margin.y;
+			}
+
+			smallNumbers[ i ].SetPos( { rect.x + pos.x, rect.y + pos.y } );
+
+			pos.x += ( size.w + margin.x );
+		}
 	}
 	inline void operator=( int32_t value_ )
 	{
@@ -78,9 +119,26 @@ struct Position// : Texture_Text
 	}
 	void Render( SDL_Renderer* renderer )
 	{
-		SDL_SetRenderDrawColor( renderer, 0,0, 255, 255 );
-		SDL_RenderDrawRect( renderer, &rect );
 		Refresh( renderer );
+		SDL_SetRenderDrawColor( renderer, 0,0, 0, 255 );
 		mainNumber.Render( renderer );
+		SDL_SetRenderDrawColor( renderer, 0,0, 255, 255 );
+
+		SDL_RenderDrawRect( renderer, &rect );
+
+		SDL_SetRenderDrawColor( renderer, 0, 255, 0, 255 );
+
+
+		for ( auto i = 0; i < 9 ; ++i )
+		{
+			SDL_Rect r = smallNumbers[ i ].GetRect();
+			r.w = r.h;
+			r.x = rect.x + 5;
+			r.y = rect.y + 5;
+
+			SDL_RenderDrawRect( renderer, &r );
+			smallNumbers[ i ].Render( renderer );
+			SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255 );
+		}
 	}
 };
