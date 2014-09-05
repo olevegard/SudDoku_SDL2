@@ -10,13 +10,15 @@ struct Position// : Texture_Text
 	int32_t value;
 	bool locked;
 	std::array< bool, 9 > possible;
+	int32_t countPossible;
 	Texture_Text mainNumber;
 	std::array< Texture_Text, 9 > smallNumbers;
 
 	SDL_Rect rect;
 
 	Position()
-		:	rect( { 10, 10, 80, 80 } )
+		:	countPossible( 9 )
+		,	rect( { 10, 10, 80, 80 } )
 	{
 		mainNumber.SetPos( { rect.x + 10, rect.y + 10 } );
 		locked = false;
@@ -61,6 +63,7 @@ struct Position// : Texture_Text
 
 		std::fill( std::begin( possible ), std::end( possible ), false );
 		possible[ static_cast< uint32_t > ( value ) - 1 ] = true;
+		countPossible = 0;
 	}
 	int32_t GetValue() const
 	{
@@ -104,6 +107,30 @@ struct Position// : Texture_Text
 			pos.x += ( size.w + margin.x );
 		}
 	}
+	bool Solve()
+	{
+		if ( countPossible == 1 )
+		{
+			for ( auto i = 0 ; i < 9 ; ++i )
+			{
+				if ( possible[ i ] )
+				{
+					SetValue( static_cast< int32_t> ( i + 1 ) );
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+	void RemovePossibility( int32_t digit )
+	{
+		if ( ! possible[ static_cast< uint32_t > ( digit - 1 ) ] )
+			return;
+
+		possible[ static_cast< uint32_t > ( digit - 1 ) ] = false;
+		--countPossible;
+	}
 	inline void operator=( int32_t value_ )
 	{
 		if ( value_ != 0 )
@@ -117,28 +144,33 @@ struct Position// : Texture_Text
 	{
 		return os << value;
 	}
-	void Render( SDL_Renderer* renderer )
+	void RenderPossibilities( SDL_Renderer* renderer )
 	{
-		Refresh( renderer );
-		SDL_SetRenderDrawColor( renderer, 0,0, 0, 255 );
-		mainNumber.Render( renderer );
-		SDL_SetRenderDrawColor( renderer, 0,0, 255, 255 );
-
-		SDL_RenderDrawRect( renderer, &rect );
-
-		SDL_SetRenderDrawColor( renderer, 0, 255, 0, 255 );
-
-
 		for ( auto i = 0; i < 9 ; ++i )
 		{
-			SDL_Rect r = smallNumbers[ i ].GetRect();
-			r.w = r.h;
-			r.x = rect.x + 5;
-			r.y = rect.y + 5;
+			if ( !possible[ i ] )
+				continue;
 
-			SDL_RenderDrawRect( renderer, &r );
 			smallNumbers[ i ].Render( renderer );
 			SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255 );
 		}
+	}
+	void RenderDigit( SDL_Renderer* renderer )
+	{
+		SDL_SetRenderDrawColor( renderer, 0,0, 0, 255 );
+		mainNumber.Render( renderer );
+	}
+	void Render( SDL_Renderer* renderer )
+	{
+		Refresh( renderer );
+
+		SDL_SetRenderDrawColor( renderer, 0,0, 255, 255 );
+		SDL_RenderDrawRect( renderer, &rect );
+		SDL_SetRenderDrawColor( renderer, 0, 255, 0, 255 );
+
+		if ( !locked )
+			RenderPossibilities( renderer );
+		else
+			RenderDigit( renderer );
 	}
 };

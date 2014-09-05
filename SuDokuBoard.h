@@ -149,7 +149,7 @@ class SuDokuBoard
 					if ( col > 0 && ( ( col  % 3 ) == 0 ) )
 						pos.x += 80;
 
-					board[col][row].InitMainNumber( font.GetFont(), { 255, 0, 0, 255 }, { 255, 255, 255, 255 } );
+					board[col][row].InitMainNumber( font.GetFont(), { 0, 255, 0, 255 }, { 255, 255, 255, 255 } );
 					board[col][row].InitSmallNumber( fontSmall.GetFont(), { 255, 0, 0, 255 }, { 0, 0, 255, 255 } );
 					board[col][row].Refresh( newRenderer.renderer );
 					board[col][row].SetPos( pos );
